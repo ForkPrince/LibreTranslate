@@ -1,4 +1,4 @@
-# Docker Image with Models for LibreTranslate
+# LibreTranslate (with models)
 
 This project provides automated Docker images of [LibreTranslate](https://github.com/LibreTranslate/LibreTranslate) that include all language models. It is a modified fork of [t-lo/LibreTranslate-ghcr-publisher](https://github.com/t-lo/LibreTranslate-ghcr-publisher).
 
