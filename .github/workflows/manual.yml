@@ -18,7 +18,7 @@ jobs:
       contents: read
       packages: write
       id-token: write
-
+    
     steps:
       - name: Clone upstream
         uses: actions/checkout@v3
@@ -49,6 +49,11 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
+      - name: Convert repository name to lowercase
+        id: lowercase-repo
+        run: |
+          echo "::set-output name=lowercase_repo::${{ env.IMAGE_NAME | lower }}"
+
       - name: Build and push Docker image
         id: build-and-push
         uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
@@ -57,7 +62,7 @@ jobs:
           file: docker/Dockerfile
           build-args: with_models=true
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ inputs.version_tag }}
+          tags: ${{ env.REGISTRY }}/${{ steps.lowercase-repo.outputs.lowercase_repo }}:${{ inputs.version_tag }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
