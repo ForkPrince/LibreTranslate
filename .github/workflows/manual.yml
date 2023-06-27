@@ -51,7 +51,7 @@ jobs:
 
       - name: Convert repository name to lowercase
         id: lowercase-repo
-        run: echo "::set-output name=lowercase_repo::${{ env.IMAGE_NAME | lower }}"
+        run: echo "::set-env name=LOWER_REPO::$(echo ${{ env.IMAGE_NAME }} | tr '[:upper:]' '[:lower:]')"
 
       - name: Build and push Docker image
         id: build-and-push
