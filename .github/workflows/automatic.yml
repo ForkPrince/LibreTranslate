@@ -1,4 +1,4 @@
-name: Build and Publish LibreTranslate (with models)
+name: Automatic - LibreTranslate (with models)
 
 on:
     schedule:
