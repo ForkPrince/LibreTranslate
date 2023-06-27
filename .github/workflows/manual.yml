@@ -10,6 +10,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  LOWER_REPO: ''
 
 jobs:
   build:
@@ -51,7 +52,12 @@ jobs:
 
       - name: Convert repository name to lowercase
         id: lowercase-repo
-        run: echo "::set-env name=LOWER_REPO::$(echo ${{ env.IMAGE_NAME }} | tr '[:upper:]' '[:lower:]')"
+        run: |
+          echo "::set-output name=lowercase_repo::$(echo ${{ env.IMAGE_NAME }} | tr '[:upper:]' '[:lower:]')"
+
+      - name: Set lowercase repository name
+        run: |
+          echo "LOWER_REPO=${{ steps.lowercase-repo.outputs.lowercase_repo }}" >> $GITHUB_ENV
 
       - name: Build and push Docker image
         id: build-and-push
@@ -61,7 +67,7 @@ jobs:
           file: docker/Dockerfile
           build-args: with_models=true
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ env.REGISTRY }}/${{ steps.lowercase-repo.outputs.lowercase_repo }}:${{ inputs.version_tag }}
+          tags: ${{ env.REGISTRY }}/${{ env.LOWER_REPO }}:${{ inputs.version_tag }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -70,5 +76,4 @@ jobs:
         if: ${{ github.event_name != 'pull_request' }}
         env:
           COSIGN_EXPERIMENTAL: "true"
-
         run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign {}@${{ steps.build-and-push.outputs.digest }}
